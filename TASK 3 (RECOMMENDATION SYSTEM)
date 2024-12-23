@@ -1,0 +1,46 @@
+import numpy as np
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Sample Data: Users and their preferences
+movies = pd.DataFrame({
+    'movie_id': [1, 2, 3, 4, 5],
+    'title': ["The Matrix", "The Godfather", "The Dark Knight", "Pulp Fiction", "Inception"],
+    'genres': [
+        "Action Sci-Fi",
+        "Crime Drama",
+        "Action Crime",
+        "Crime Drama",
+        "Action Sci-Fi"
+    ]
+})
+
+# User preferences (sample ratings)
+ratings = pd.DataFrame({
+    'user_id': [1, 1, 2, 2, 3],
+    'movie_id': [1, 2, 2, 3, 4],
+    'rating': [5, 4, 5, 4, 5]
+})
+
+# Content-Based Filtering
+# Step 1: Calculate TF-IDF matrix for genres
+tfidf = TfidfVectorizer()
+tfidf_matrix = tfidf.fit_transform(movies['genres'])
+
+# Step 2: Compute similarity matrix
+cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+# Recommendation Function
+def recommend_movies(movie_title, cosine_sim=cosine_sim, movies=movies):
+    idx = movies.index[movies['title'] == movie_title][0]
+    sim_scores = list(enumerate(cosine_sim[idx]))
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+    sim_scores = sim_scores[1:4]  # Top 3 similar movies
+    movie_indices = [i[0] for i in sim_scores]
+    return movies.iloc[movie_indices][['title', 'genres']]
+
+# Example Usage
+if __name__ == "__main__":
+    print("Movies similar to 'The Matrix':")
+    print(recommend_movies("The Matrix"))

@@ -1,0 +1,70 @@
+def print_board(board):
+    for row in board:
+        print(" | ".join(row))
+        print("-" * 5)
+
+def check_winner(board):
+    for row in board:
+        if row[0] == row[1] == row[2] and row[0] != " ":
+            return row[0]
+
+    for col in range(3):
+        if board[0][col] == board[1][col] == board[2][col] and board[0][col] != " ":
+            return board[0][col]
+
+    if board[0][0] == board[1][1] == board[2][2] and board[0][0] != " ":
+        return board[0][0]
+
+    if board[0][2] == board[1][1] == board[2][0] and board[0][2] != " ":
+        return board[0][2]
+
+    return None
+
+def is_full(board):
+    return all(cell != " " for row in board for cell in row)
+
+def get_ai_move(board):
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == " ":
+                return i, j
+
+def tic_tac_toe():
+    board = [[" " for _ in range(3)] for _ in range(3)]
+    print("Welcome to Tic-Tac-Toe!")
+    print_board(board)
+
+    while True:
+        user_move = input("Enter your move (row and column: 1 1 for top-left): ").split()
+        row, col = int(user_move[0]) - 1, int(user_move[1]) - 1
+
+        if board[row][col] != " ":
+            print("Invalid move. Try again.")
+            continue
+
+        board[row][col] = "X"
+        print_board(board)
+
+        if check_winner(board) == "X":
+            print("Congratulations! You win!")
+            break
+
+        if is_full(board):
+            print("It's a tie!")
+            break
+
+        ai_move = get_ai_move(board)
+        board[ai_move[0]][ai_move[1]] = "O"
+        print("AI has made its move:")
+        print_board(board)
+
+        if check_winner(board) == "O":
+            print("AI wins! Better luck next time.")
+            break
+
+        if is_full(board):
+            print("It's a tie!")
+            break
+
+if __name__ == "__main__":
+    tic_tac_toe()
